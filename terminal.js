@@ -4,16 +4,29 @@
 
 let currentDirectory = '~';
 
-// Directory structure
-const DIRECTORIES = {
-    '~': ['about', 'experience', 'skills', 'projects', 'research', 'education'],
-    '~/about': [],
-    '~/experience': [],
-    '~/skills': [],
-    '~/projects': [],
-    '~/research': [],
-    '~/education': []
+// File system structure - everything is a file!
+const FILES = {
+    '~': ['about.txt', 'experience.txt', 'skills.txt', 'projects.txt', 'research.txt', 'education.txt']
 };
+
+// For backwards compatibility with directory checks
+const DIRECTORIES = {
+    '~': []
+};
+
+// ===========================
+// CONTENT VIEWER HELPER
+// ===========================
+
+function displayInViewer(htmlContent, title = 'Content Viewer') {
+    const viewer = document.getElementById('contentViewer');
+    const viewerTitle = document.querySelector('.content-viewer-title');
+
+    viewer.innerHTML = htmlContent;
+    viewerTitle.textContent = title;
+
+    return `[[;#98c379;]✓ Content displayed in viewer →]`;
+}
 
 // ===========================
 // POWERLEVEL10K PROMPT
@@ -266,7 +279,121 @@ obsessing over custom mechanical keyboards.
 };
 
 // ===========================
-// FORMATTING FUNCTIONS
+// HTML FORMATTING FUNCTIONS (for Content Viewer)
+// ===========================
+
+function formatAboutHTML() {
+    return `
+        <h1>About Simon Hartmann</h1>
+        <p><strong>Computer Science • AI Research • Innovation</strong></p>
+
+        <p>Hey there! 👋</p>
+
+        <p>I'm Simon - a Computer Science graduate student at TUM specializing in
+        Data Engineering & Analytics. My journey spans from industrial automation
+        to cutting-edge AI research.</p>
+
+        <p><strong>What I do:</strong> Currently working as a Research Engineer at SAP, building
+        scalable AI systems and exploring the frontier of agentic frameworks and MLOps.</p>
+
+        <p><strong>What I love:</strong> Innovation, emerging tech, and making machines smarter.</p>
+    `;
+}
+
+function formatExperienceHTML() {
+    let html = '<h1>Work Experience</h1>';
+
+    CONTENT.experience.forEach(job => {
+        html += `
+            <div class="job-card">
+                <div class="card-title">${job.role}</div>
+                <div class="card-subtitle">${job.company} • ${job.department}</div>
+                <div class="card-date">${job.period} | ${job.location}</div>
+                <p>${job.description}</p>
+            </div>
+        `;
+    });
+
+    return html;
+}
+
+function formatEducationHTML() {
+    let html = '<h1>Education</h1>';
+
+    CONTENT.education.forEach(edu => {
+        html += `
+            <div class="edu-card">
+                <div class="card-title">${edu.degree}</div>
+                <div class="card-subtitle">${edu.institution}</div>
+                <div class="card-date">${edu.period} | ${edu.location}</div>
+                ${edu.focus ? `<p><strong>Focus:</strong> ${edu.focus}</p>` : ''}
+                ${edu.thesis ? `<p><strong>Thesis:</strong> ${edu.thesis}</p>` : ''}
+            </div>
+        `;
+    });
+
+    return html;
+}
+
+function formatSkillsHTML() {
+    let html = '<h1>Technical Skills</h1>';
+
+    html += '<h2>Programming Languages</h2><ul>';
+    CONTENT.skills.languages.forEach(lang => html += `<li>${lang}</li>`);
+    html += '</ul>';
+
+    html += '<h2>AI/ML & Data</h2><ul>';
+    CONTENT.skills.aiml.forEach(skill => html += `<li>${skill}</li>`);
+    html += '</ul>';
+
+    html += '<h2>Cloud & DevOps</h2><ul>';
+    CONTENT.skills.cloud.forEach(skill => html += `<li>${skill}</li>`);
+    html += '</ul>';
+
+    html += '<h2>Tools & Frameworks</h2><ul>';
+    CONTENT.skills.tools.forEach(tool => html += `<li>${tool}</li>`);
+    html += '</ul>';
+
+    return html;
+}
+
+function formatProjectsHTML() {
+    let html = '<h1>Academic Projects</h1>';
+
+    CONTENT.projects.forEach(project => {
+        html += `
+            <div class="project-card">
+                <div class="card-title">${project.name}</div>
+                <div class="card-subtitle">${project.course}</div>
+                <p>${project.description}</p>
+                ${project.tech ? `<p><em>Technologies: ${project.tech}</em></p>` : ''}
+            </div>
+        `;
+    });
+
+    return html;
+}
+
+function formatResearchHTML() {
+    let html = '<h1>Research & Publications</h1>';
+
+    if (CONTENT.publications && CONTENT.publications.length > 0) {
+        html += '<h2>Publications</h2><ul>';
+        CONTENT.publications.forEach(pub => html += `<li>${pub}</li>`);
+        html += '</ul>';
+    }
+
+    if (CONTENT.patents && CONTENT.patents.length > 0) {
+        html += '<h2>Patents</h2><ul>';
+        CONTENT.patents.forEach(patent => html += `<li>${patent}</li>`);
+        html += '</ul>';
+    }
+
+    return html;
+}
+
+// ===========================
+// FORMATTING FUNCTIONS (for Terminal)
 // ===========================
 
 function formatAbout() {
@@ -391,23 +518,28 @@ function formatHelp() {
     const helpText = `
 [[;#bd93f9;]━━━ AVAILABLE COMMANDS ━━━]
 
-[[;#c678dd;]Navigation:]\n  [[;#61afef;]cd <dir>]   Change directory (e.g., cd projects/)
-  [[;#61afef;]ls]         List current directory contents
+[[;#c678dd;]Navigation:]
+  [[;#61afef;]cd <dir>]   Change directory (e.g., cd projects/)
+  [[;#61afef;]ls]         List directory contents (horizontal)
+  [[;#61afef;]l]          Detailed list with hidden files (ls -la)
+  [[;#61afef;]ll]         Detailed list without hidden files (ls -l)
   [[;#61afef;]pwd]        Print working directory
   [[;#61afef;]cat <dir>]  Display content of directory
 
-[[;#c678dd;]Content:]\n  [[;#61afef;]about]      Learn about Simon
+[[;#c678dd;]Content:]
+  [[;#61afef;]about]      Learn about Simon
   [[;#61afef;]experience] View work experience
   [[;#61afef;]education]  View education background
   [[;#61afef;]skills]     See technical skills
   [[;#61afef;]projects]   Browse academic projects
   [[;#61afef;]research]   View publications & patents
 
-[[;#c678dd;]Actions:]\n  [[;#61afef;]contact]    Open vim-style contact form
+[[;#c678dd;]Actions:]
   [[;#61afef;]clear]      Clear terminal screen
   [[;#61afef;]help]       Show this help message
 
-[[;#c678dd;]Easter Eggs:]\n  [[;#61afef;]coffee]     Brew some virtual coffee
+[[;#c678dd;]Easter Eggs:]
+  [[;#61afef;]coffee]     Brew some virtual coffee
   [[;#61afef;]fortune]    Get a random tech quote
   [[;#61afef;]cowsay]     Make the cow speak
   [[;#61afef;]whoami]     Identity check
@@ -415,10 +547,11 @@ function formatHelp() {
   [[;#61afef;]hack]       Initiate "hacking" sequence
   [[;#61afef;]vim]        Just kidding...
 
-[[;#8a8a8a;]💡 Pro tips:]\n  • Use TAB for autocomplete
+[[;#8a8a8a;]💡 Pro tips:]
+  • Use TAB for autocomplete
   • Use ↑/↓ for command history
   • Navigate like a real terminal with cd, ls, pwd
-  • Press 'i' in contact mode to enter INSERT mode
+  • Connect with Simon on LinkedIn (link in footer)
 `;
 
     return cowsay(fortune()) + '\n' + helpText;
@@ -460,42 +593,42 @@ function changeDirectory(path, term) {
 }
 
 function listDirectory(format = 'simple') {
-    const contents = DIRECTORIES[currentDirectory];
+    const files = FILES[currentDirectory];
+    const contents = files || [];
 
     if (!contents || contents.length === 0) {
-        // If we're in a content directory, show proper listing
-        const dirName = currentDirectory.split('/').pop();
-
-        // Show . and .. for navigation
-        if (format === 'long') {
-            let output = '\n';
-            output += `[[;#56b6c2;]drwxr-xr-x  2 simon  staff  ./]\n`;
-            output += `[[;#56b6c2;]drwxr-xr-x  2 simon  staff  ../]\n`;
-            return output + '\n[[;#8a8a8a;]Tip: Use] [[;#bd93f9;]cat] [[;#8a8a8a;]to view content]\n';
-        }
-
-        return '\n[[;#56b6c2;]./]              [[;#56b6c2;]../]\n\n[[;#8a8a8a;]Tip: Use] [[;#bd93f9;]cat] [[;#8a8a8a;]to view content]\n';
+        return '\n[[;#8a8a8a;]Empty directory]\n';
     }
 
-    // Simple ls - just names in columns
+    // ls - simple horizontal list (like real Unix)
     if (format === 'simple') {
-        let output = '\n';
-        const itemsPerRow = 4;
-        for (let i = 0; i < contents.length; i++) {
-            const item = contents[i].padEnd(15, ' ');
-            output += `[[;#56b6c2;]${item}]`;
-            if ((i + 1) % itemsPerRow === 0) output += '\n';
-        }
+        let output = '';
+        contents.forEach((item, i) => {
+            output += `[[;#e4e4e4;]${item}]`;
+            if (i < contents.length - 1) output += '    '; // 4 spaces between items
+        });
         return output + '\n';
     }
 
-    // ll - long format with details
-    if (format === 'long') {
-        let output = '\n';
-        output += `[[;#56b6c2;]drwxr-xr-x  2 simon  staff  ./]\n`;
-        output += `[[;#56b6c2;]drwxr-xr-x  2 simon  staff  ../]\n`;
+    // l (la) - detailed list with hidden files (ls -la)
+    if (format === 'all') {
+        let output = 'total ' + (contents.length * 8) + '\n';
+        output += `[[;#56b6c2;]drwxr-xr-x  ${contents.length + 2} simon  staff  ${(contents.length + 2) * 32}B  ./]\n`;
+        output += `[[;#56b6c2;]drwxr-xr-x  7 simon  staff  224B  ../]\n`;
+        output += `[[;#8a8a8a;]drwxr-xr-x  3 simon  staff   96B  .git/]\n`;
         contents.forEach(item => {
-            output += `[[;#8a8a8a;]drwxr-xr-x  2 simon  staff]  [[;#bd93f9;]${item}/]\n`;
+            const size = Math.floor(Math.random() * 50) + 10; // Random size 10-60KB
+            output += `[[;#8a8a8a;]-rw-r--r--  1 simon  staff]  [[;#e4e4e4;]${size}K  ${item}]\n`;
+        });
+        return output + '\n';
+    }
+
+    // ll - long format WITHOUT hidden files (ls -l)
+    if (format === 'long') {
+        let output = 'total ' + (contents.length * 8) + '\n';
+        contents.forEach(item => {
+            const size = Math.floor(Math.random() * 50) + 10;
+            output += `[[;#8a8a8a;]-rw-r--r--  1 simon  staff]  [[;#e4e4e4;]${size}K  ${item}]\n`;
         });
         return output + '\n';
     }
@@ -504,122 +637,41 @@ function listDirectory(format = 'simple') {
     return listDirectory('simple');
 }
 
-function catDirectory(path) {
-    if (!path) {
-        // Show current directory content
-        const dirName = currentDirectory.split('/').pop();
-        if (dirName === 'about') return formatAbout();
-        if (dirName === 'experience') return formatExperience();
-        if (dirName === 'education') return formatEducation();
-        if (dirName === 'skills') return formatSkills();
-        if (dirName === 'projects') return formatProjects();
-        if (dirName === 'research') return formatResearch();
-        return listDirectory();
+function catFile(filename) {
+    if (!filename) {
+        return `[[;#e06c75;]cat: missing filename]\n[[;#8a8a8a;]Usage: cat <filename>]`;
     }
 
-    // Normalize path
-    let targetPath = path.startsWith('~/') ? path : `${currentDirectory}/${path}`.replace('//', '/');
-    targetPath = targetPath.replace(/\/$/, '');
-
-    if (targetPath === '~/about' || path === 'about') return formatAbout();
-    if (targetPath === '~/experience' || path === 'experience') return formatExperience();
-    if (targetPath === '~/education' || path === 'education') return formatEducation();
-    if (targetPath === '~/skills' || path === 'skills') return formatSkills();
-    if (targetPath === '~/projects' || path === 'projects') return formatProjects();
-    if (targetPath === '~/research' || path === 'research') return formatResearch();
-
-    return `[[;#e06c75;]cat: ${path}: No such file or directory]`;
-}
-
-// ===========================
-// CONTACT MODAL FUNCTIONS
-// ===========================
-
-function openContactModal() {
-    document.getElementById('contactModal').classList.add('active');
-    return '[[;#98c379;]Opening contact form...]';
-}
-
-function closeContactModal() {
-    document.getElementById('contactModal').classList.remove('active');
-    document.getElementById('contactForm').reset();
-    document.getElementById('contactBody').innerHTML = `
-        <form id="contactForm">
-            <div class="contact-form-group">
-                <label for="contactName">Name</label>
-                <input type="text" id="contactName" name="name" required placeholder="Your name">
-            </div>
-            <div class="contact-form-group">
-                <label for="contactEmail">Email</label>
-                <input type="email" id="contactEmail" name="email" required placeholder="your.email@example.com">
-            </div>
-            <div class="contact-form-group">
-                <label for="contactMessage">Message</label>
-                <textarea id="contactMessage" name="message" required placeholder="Your message..."></textarea>
-            </div>
-            <div class="contact-checkbox">
-                <input type="checkbox" id="contactCV" name="requestCV">
-                <label for="contactCV">I'd like to request your CV</label>
-            </div>
-            <div class="contact-buttons">
-                <button type="button" class="contact-btn contact-btn-secondary" onclick="closeContactModal()">Cancel</button>
-                <button type="submit" class="contact-btn contact-btn-primary">Send Message</button>
-            </div>
-        </form>
-    `;
-    setupContactForm();
-}
-
-function setupContactForm() {
-    const form = document.getElementById('contactForm');
-    if (!form) return;
-
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const formData = {
-            name: document.getElementById('contactName').value,
-            email: document.getElementById('contactEmail').value,
-            message: document.getElementById('contactMessage').value,
-            requestCV: document.getElementById('contactCV').checked ? 'Yes, I would like to request your CV' : 'No'
-        };
-
-        // Send to Formspree
-        fetch('https://formspree.io/f/meelbzno', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(formData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Show success message
-            document.getElementById('contactBody').innerHTML = `
-                <div class="contact-success">
-                    <div class="contact-success-icon">✓</div>
-                    <h3>Message Sent Successfully!</h3>
-                    <p>Thanks for reaching out! I'll get back to you at <strong>${formData.email}</strong> soon.</p>
-                    ${formData.requestCV === 'Yes, I would like to request your CV' ? '<p>CV request noted - I\'ll include it in my response.</p>' : ''}
-                    <button class="contact-btn contact-btn-primary" onclick="closeContactModal()">Close</button>
-                </div>
-            `;
-        })
-        .catch(err => {
-            console.error('Failed to send message:', err);
-            alert('Failed to send message. Please try again.');
-        });
-    });
-}
-
-// Close modal when clicking outside
-window.addEventListener('click', function(event) {
-    const modal = document.getElementById('contactModal');
-    if (event.target === modal) {
-        closeContactModal();
+    // Normalize filename (remove .txt if not provided, add if missing)
+    let file = filename;
+    if (!file.endsWith('.txt')) {
+        file = file + '.txt';
     }
-});
+
+    // Check if file exists
+    const files = FILES[currentDirectory] || [];
+    if (!files.includes(file)) {
+        return `[[;#e06c75;]cat: ${filename}: No such file or directory]`;
+    }
+
+    // Map files to their display functions
+    const fileMap = {
+        'about.txt': { html: formatAboutHTML, title: 'About' },
+        'experience.txt': { html: formatExperienceHTML, title: 'Work Experience' },
+        'education.txt': { html: formatEducationHTML, title: 'Education' },
+        'skills.txt': { html: formatSkillsHTML, title: 'Technical Skills' },
+        'projects.txt': { html: formatProjectsHTML, title: 'Projects' },
+        'research.txt': { html: formatResearchHTML, title: 'Research' }
+    };
+
+    const fileInfo = fileMap[file];
+    if (fileInfo) {
+        displayInViewer(fileInfo.html(), fileInfo.title);
+        return `[[;#98c379;]✓ Displaying ${file} in viewer →]`;
+    }
+
+    return `[[;#e06c75;]cat: ${filename}: No such file or directory]`;
+}
 
 // ===========================
 // EASTER EGGS
@@ -687,39 +739,38 @@ $(document).ready(function() {
             case 'cd':
                 return changeDirectory(args, term);
             case 'ls':
-            case 'l':
                 return listDirectory('simple');
+            case 'l':
+                return listDirectory('all'); // ls -la with hidden files
             case 'll':
-                return listDirectory('long');
+                return listDirectory('long'); // ls -l without hidden files
             case 'la':
             case 'ls -la':
-                return listDirectory('long');
+                return listDirectory('all');
             case '..':
                 return changeDirectory('..', term);
             case 'pwd':
                 return `[[;#98c379;]${currentDirectory}]`;
             case 'cat':
-                return catDirectory(args);
+                return catFile(args);
 
-            // Content commands (work from anywhere)
+            // Content commands (shortcuts - work from anywhere)
             case 'about':
-                return formatAbout();
+                return catFile('about.txt');
             case 'experience':
-                return formatExperience(args.includes('--details'));
+                return catFile('experience.txt');
             case 'education':
-                return formatEducation();
+                return catFile('education.txt');
             case 'skills':
             case 'tech':
-                return formatSkills();
+                return catFile('skills.txt');
             case 'projects':
-                return formatProjects();
+                return catFile('projects.txt');
             case 'research':
             case 'publications':
-                return formatResearch();
+                return catFile('research.txt');
 
             // Actions
-            case 'contact':
-                return openContactModal();
             case 'help':
                 return formatHelp();
             case 'clear':
@@ -755,14 +806,14 @@ $(document).ready(function() {
             // Available commands
             const commands = [
                 'help', 'about', 'experience', 'education', 'skills', 'tech',
-                'projects', 'research', 'publications', 'contact', 'clear',
+                'projects', 'research', 'publications', 'clear',
                 'cd', 'ls', 'l', 'll', 'la', 'pwd', 'cat', '..',
                 'coffee', 'fortune', 'cowsay', 'whoami', 'sudo', 'hack', 'vim', 'exit'
             ];
 
-            // Add directories if in home
-            if (currentDirectory === '~') {
-                commands.push(...DIRECTORIES['~'].map(d => d + '/'));
+            // Add files from current directory
+            if (currentDirectory === '~' && FILES['~']) {
+                commands.push(...FILES['~']);
             }
 
             callback(commands.filter(cmd => cmd.startsWith(string)));
@@ -779,7 +830,4 @@ $(document).ready(function() {
     term.on('prompt', function() {
         $('.terminal-title').text(`simon@portfolio: ${currentDirectory}`);
     });
-
-    // Initialize contact form
-    setupContactForm();
 });

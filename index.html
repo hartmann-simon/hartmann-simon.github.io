@@ -17,17 +17,38 @@
             <p class="subheadline">Type <span class="highlight">help</span> to get started, or just wing it 🤷</p>
         </header>
 
-        <!-- Terminal Section with iTerm2 Frame -->
-        <div class="terminal-wrapper">
-            <div class="terminal-titlebar">
-                <div class="traffic-lights">
-                    <div class="traffic-light close"></div>
-                    <div class="traffic-light minimize"></div>
-                    <div class="traffic-light maximize"></div>
+        <!-- Split Screen: Terminal Left, Content Viewer Right -->
+        <div class="split-container">
+            <!-- Terminal Section with iTerm2 Frame -->
+            <div class="terminal-wrapper">
+                <div class="terminal-titlebar">
+                    <div class="traffic-lights">
+                        <div class="traffic-light close"></div>
+                        <div class="traffic-light minimize"></div>
+                        <div class="traffic-light maximize"></div>
+                    </div>
+                    <div class="terminal-title">simon@portfolio: ~</div>
                 </div>
-                <div class="terminal-title">simon@portfolio: ~</div>
+                <div id="terminal"></div>
             </div>
-            <div id="terminal"></div>
+
+            <!-- Content Viewer Section -->
+            <div class="content-viewer-wrapper">
+                <div class="content-viewer-titlebar">
+                    <div class="traffic-lights">
+                        <div class="traffic-light close"></div>
+                        <div class="traffic-light minimize"></div>
+                        <div class="traffic-light maximize"></div>
+                    </div>
+                    <div class="content-viewer-title">Content Viewer</div>
+                </div>
+                <div id="contentViewer" class="content-viewer">
+                    <div class="content-viewer-placeholder">
+                        <div class="placeholder-icon">📄</div>
+                        <p>Use <code>cat &lt;file&gt;</code> or click a content section to view here</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Footer Section -->
@@ -48,44 +69,6 @@
                 </a>
             </div>
         </footer>
-    </div>
-
-    <!-- Contact Modal -->
-    <div id="contactModal" class="contact-modal">
-        <div class="contact-window">
-            <div class="contact-titlebar">
-                <div class="traffic-lights">
-                    <div class="traffic-light close" onclick="closeContactModal()"></div>
-                    <div class="traffic-light minimize"></div>
-                    <div class="traffic-light maximize"></div>
-                </div>
-                <div class="contact-title">Contact Form</div>
-            </div>
-            <div class="contact-body" id="contactBody">
-                <form id="contactForm">
-                    <div class="contact-form-group">
-                        <label for="contactName">Name</label>
-                        <input type="text" id="contactName" name="name" required placeholder="Your name">
-                    </div>
-                    <div class="contact-form-group">
-                        <label for="contactEmail">Email</label>
-                        <input type="email" id="contactEmail" name="email" required placeholder="your.email@example.com">
-                    </div>
-                    <div class="contact-form-group">
-                        <label for="contactMessage">Message</label>
-                        <textarea id="contactMessage" name="message" required placeholder="Your message..."></textarea>
-                    </div>
-                    <div class="contact-checkbox">
-                        <input type="checkbox" id="contactCV" name="requestCV">
-                        <label for="contactCV">I'd like to request your CV</label>
-                    </div>
-                    <div class="contact-buttons">
-                        <button type="button" class="contact-btn contact-btn-secondary" onclick="closeContactModal()">Cancel</button>
-                        <button type="submit" class="contact-btn contact-btn-primary">Send Message</button>
-                    </div>
-                </form>
-            </div>
-        </div>
     </div>
 
     <script src="terminal.js"></script>
